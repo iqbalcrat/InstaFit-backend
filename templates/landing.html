@@ -31,6 +31,102 @@
             overflow-x: hidden;
         }
 
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: transparent;
+            margin: 5% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            background: #000;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Modal Animation */
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal.show .modal-content {
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
         /* Hero Section */
         .hero {
             background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
@@ -126,6 +222,7 @@
             align-items: center;
             gap: 0.5rem;
             border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
         }
 
         .btn-secondary:hover {
@@ -487,6 +584,11 @@
             .sites-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
         }
 
         /* Animations */
@@ -516,6 +618,24 @@
     </style>
 </head>
 <body>
+    <!-- Video Demo Modal -->
+    <div id="demoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">InstaFit Demo Video</div>
+                <span class="close">&times;</span>
+            </div>
+            <div class="video-container">
+                <iframe id="demoVideo" src="https://www.youtube.com/embed/Uf3om6Wr6LE?enablejsapi=1" 
+                        title="InstaFit Demo Video" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
@@ -527,10 +647,10 @@
                         <i class="fab fa-chrome"></i>
                         Install Extension
                     </a>
-                    <a href="#demo" class="btn-secondary">
+                    <button id="demoBtn" class="btn-secondary">
                         <i class="fas fa-play"></i>
                         Watch Demo
-                    </a>
+                    </button>
                 </div>
             </div>
             <div class="hero-visual fade-in-up">
@@ -708,6 +828,52 @@
     </footer>
 
     <script>
+        // Modal functionality
+        const modal = document.getElementById('demoModal');
+        const demoBtn = document.getElementById('demoBtn');
+        const closeBtn = document.querySelector('.close');
+        const demoVideo = document.getElementById('demoVideo');
+
+        // Open modal
+        demoBtn.addEventListener('click', function() {
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        });
+
+        // Close modal
+        closeBtn.addEventListener('click', function() {
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+            // Stop video when modal is closed
+            const videoSrc = demoVideo.src;
+            demoVideo.src = '';
+            demoVideo.src = videoSrc;
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+                // Stop video when modal is closed
+                const videoSrc = demoVideo.src;
+                demoVideo.src = '';
+                demoVideo.src = videoSrc;
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('show')) {
+                modal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+                // Stop video when modal is closed
+                const videoSrc = demoVideo.src;
+                demoVideo.src = '';
+                demoVideo.src = videoSrc;
+            }
+        });
+
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
